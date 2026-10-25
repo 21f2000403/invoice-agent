@@ -863,13 +863,15 @@ Input:
                             {
                                 "role": "system",
                                 "content": (
-                                    "Return valid JSON only. Never invent invoice "
-                                    "facts or evidence references."
+                                    "Return the complete JSON in the final answer content. "
+                                    "Do not return an empty or reasoning-only answer. "
+                                    "Never invent invoice facts or evidence references."
                                 ),
                             },
                             {"role": "user", "content": prompt},
                         ],
                         "max_tokens": 4096,
+                        "reasoning": {"effort": "low", "summary": "concise"},
                         "temperature": 0,
                     },
                     timeout=40.0,
