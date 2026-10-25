@@ -6,6 +6,7 @@ import hashlib
 import sqlite3
 import threading
 import re
+import logging
 
 from typing import Any
 from dotenv import load_dotenv
@@ -43,6 +44,7 @@ RECEIPTS_MEDIA_TYPE = "application/vnd.ga5.invoice-action-receipts+json"
 RESULTS_MEDIA_TYPE = "application/vnd.ga5.invoice-action-results+json"
 
 db_lock = threading.RLock()
+logger = logging.getLogger("invoice_agent")
 request_locks_guard = threading.Lock()
 request_locks = {}
 
@@ -859,6 +861,10 @@ Input:
             result = json.loads(response.choices[0].message.content)
 
         except Exception as exc:
+            logger.exception(
+                "Invoice proposal provider call failed (%s)",
+                type(exc).__name__,
+            )
             raise HTTPException(
                 502,
                 "Invoice proposal generation failed",
