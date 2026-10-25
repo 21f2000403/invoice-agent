@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: invoice-action-agent
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DATABASE_PATH
+        value: /data/invoice_agent.db
+    disk:
+      name: invoice-agent-state
+      mountPath: /data
+      sizeGB: 1
