@@ -63,6 +63,8 @@ class SendMessageBody(BaseModel):
 # --------------------------------------------------
 
 def get_connection():
+    database_directory = os.path.dirname(os.path.abspath(DATABASE))
+    os.makedirs(database_directory, exist_ok=True)
     connection = sqlite3.connect(DATABASE, timeout=15)
     connection.row_factory = sqlite3.Row
     return connection
