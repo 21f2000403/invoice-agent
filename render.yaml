@@ -5,12 +5,12 @@ services:
     plan: starter
     healthCheckPath: /health
     envVars:
-      - key: GOOGLE_API_KEY
+      - key: OPENROUTER_API_KEY
         sync: false
       - key: AI_PROVIDER
-        value: gemini
-      - key: GEMINI_MODEL
-        value: gemini-3.8-flash
+        value: openrouter
+      - key: OPENROUTER_MODEL
+        value: nvidia/nemotron-3-ultra-550b-a55b:free
       - key: DATABASE_PATH
         value: /data/invoice_agent.db
     disk:

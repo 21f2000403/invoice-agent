@@ -838,10 +838,45 @@ Input:
         try:
             provider = os.getenv(
                 "AI_PROVIDER",
-                "gemini" if os.getenv("GOOGLE_API_KEY") else "groq",
+                "openrouter" if os.getenv("OPENROUTER_API_KEY")
+                else "gemini" if os.getenv("GOOGLE_API_KEY")
+                else "groq",
             ).lower()
 
-            if provider == "gemini":
+            if provider == "openrouter":
+                api_key = os.getenv("OPENROUTER_API_KEY")
+                if not api_key:
+                    raise RuntimeError("OPENROUTER_API_KEY is not configured")
+                model = os.getenv(
+                    "OPENROUTER_MODEL",
+                    "nvidia/nemotron-3-ultra-550b-a55b:free",
+                )
+                response = httpx.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": model,
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": (
+                                    "Return valid JSON only. Never invent invoice "
+                                    "facts or evidence references."
+                                ),
+                            },
+                            {"role": "user", "content": prompt},
+                        ],
+                        "temperature": 0,
+                    },
+                    timeout=40.0,
+                )
+                response.raise_for_status()
+                result_text = response.json()["choices"][0]["message"]["content"]
+                result = json.loads(result_text)
+            elif provider == "gemini":
                 api_key = os.getenv("GOOGLE_API_KEY")
                 if not api_key:
                     raise RuntimeError("GOOGLE_API_KEY is not configured")
@@ -890,7 +925,9 @@ Input:
                 )
                 result = json.loads(response.choices[0].message.content)
             else:
-                raise RuntimeError("AI_PROVIDER must be gemini or groq")
+                raise RuntimeError(
+                    "AI_PROVIDER must be openrouter, gemini, or groq"
+                )
 
         except Exception as exc:
             logger.exception(

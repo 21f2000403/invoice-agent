@@ -4,9 +4,8 @@ FastAPI implementation of the A2A 1.0 invoice proposal and receipt API.
 
 ## Run locally
 
-Python 3.12+ is required. Set `GOOGLE_API_KEY` for Gemini-based invoice
-understanding, then start the API. If a Google key is absent, the service uses
-Groq when `GROQ_API_KEY` is configured:
+Python 3.12+ is required. Set `OPENROUTER_API_KEY` for the free Nemotron route,
+then start the API. The service also supports Gemini and Groq:
 
 ```sh
 python -m pip install -r requirements.txt
@@ -31,8 +30,10 @@ and decision state is stored at `/data/invoice_agent.db`. Configure:
 
 | Variable | Value |
 | --- | --- |
-| `GOOGLE_API_KEY` | Google AI Studio API key, stored as a host secret |
-| `AI_PROVIDER` | `gemini` for Gemini or `groq` for Groq; defaults to Gemini when `GOOGLE_API_KEY` is set |
+| `OPENROUTER_API_KEY` | OpenRouter API key, stored as a host secret |
+| `AI_PROVIDER` | `openrouter`, `gemini`, or `groq`; defaults to the provider with a configured key, in that order |
+| `OPENROUTER_MODEL` | Optional; defaults to `nvidia/nemotron-3-ultra-550b-a55b:free` |
+| `GOOGLE_API_KEY` | Google AI Studio key, stored as a host secret |
 | `GEMINI_MODEL` | Optional; defaults to `gemini-3.8-flash` |
 | `DATABASE_PATH` | `/data/invoice_agent.db` |
 | `AGENT_BASE_URL` | The exact public HTTPS base URL, with no trailing slash or subpath |
