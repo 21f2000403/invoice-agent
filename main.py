@@ -7,6 +7,7 @@ import sqlite3
 import threading
 import re
 import logging
+import httpx
 
 from typing import Any
 from dotenv import load_dotenv
@@ -835,30 +836,61 @@ Input:
 """
 
         try:
-            global groq_client
-            if groq_client is None:
-                api_key = os.getenv("GROQ_API_KEY")
+            provider = os.getenv(
+                "AI_PROVIDER",
+                "gemini" if os.getenv("GOOGLE_API_KEY") else "groq",
+            ).lower()
+
+            if provider == "gemini":
+                api_key = os.getenv("GOOGLE_API_KEY")
                 if not api_key:
-                    raise RuntimeError("GROQ_API_KEY is not configured")
-                groq_client = Groq(api_key=api_key)
-
-            response = groq_client.chat.completions.create(
-                model=GROQ_MODEL,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "Return valid JSON only. Never invent invoice "
-                            "facts or evidence references."
-                        ),
+                    raise RuntimeError("GOOGLE_API_KEY is not configured")
+                model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+                response = httpx.post(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                    headers={"x-goog-api-key": api_key},
+                    json={
+                        "contents": [{
+                            "role": "user",
+                            "parts": [{"text": prompt}],
+                        }],
+                        "generationConfig": {
+                            "responseMimeType": "application/json",
+                            "temperature": 0,
+                        },
                     },
-                    {"role": "user", "content": prompt},
-                ],
-                response_format={"type": "json_object"},
-                temperature=0,
-            )
+                    timeout=40.0,
+                )
+                response.raise_for_status()
+                response_data = response.json()
+                result_text = response_data["candidates"][0]["content"]["parts"][0]["text"]
+                result = json.loads(result_text)
+            elif provider == "groq":
+                global groq_client
+                if groq_client is None:
+                    api_key = os.getenv("GROQ_API_KEY")
+                    if not api_key:
+                        raise RuntimeError("GROQ_API_KEY is not configured")
+                    groq_client = Groq(api_key=api_key)
 
-            result = json.loads(response.choices[0].message.content)
+                response = groq_client.chat.completions.create(
+                    model=GROQ_MODEL,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": (
+                                "Return valid JSON only. Never invent invoice "
+                                "facts or evidence references."
+                            ),
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    response_format={"type": "json_object"},
+                    temperature=0,
+                )
+                result = json.loads(response.choices[0].message.content)
+            else:
+                raise RuntimeError("AI_PROVIDER must be gemini or groq")
 
         except Exception as exc:
             logger.exception(

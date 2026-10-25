@@ -5,8 +5,12 @@ services:
     plan: starter
     healthCheckPath: /health
     envVars:
-      - key: GROQ_API_KEY
+      - key: GOOGLE_API_KEY
         sync: false
+      - key: AI_PROVIDER
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
       - key: DATABASE_PATH
         value: /data/invoice_agent.db
     disk:

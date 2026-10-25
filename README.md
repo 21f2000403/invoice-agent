@@ -4,8 +4,9 @@ FastAPI implementation of the A2A 1.0 invoice proposal and receipt API.
 
 ## Run locally
 
-Python 3.12+ is required. Set `GROQ_API_KEY` for Groq-based invoice
-understanding, then start the API:
+Python 3.12+ is required. Set `GOOGLE_API_KEY` for Gemini-based invoice
+understanding, then start the API. If a Google key is absent, the service uses
+Groq when `GROQ_API_KEY` is configured:
 
 ```sh
 python -m pip install -r requirements.txt
@@ -30,9 +31,12 @@ and decision state is stored at `/data/invoice_agent.db`. Configure:
 
 | Variable | Value |
 | --- | --- |
-| `GROQ_API_KEY` | Your provider key, stored as a host secret |
+| `GOOGLE_API_KEY` | Google AI Studio API key, stored as a host secret |
+| `AI_PROVIDER` | `gemini` for Gemini or `groq` for Groq; defaults to Gemini when `GOOGLE_API_KEY` is set |
+| `GEMINI_MODEL` | Optional; defaults to `gemini-3.8-flash` |
 | `DATABASE_PATH` | `/data/invoice_agent.db` |
 | `AGENT_BASE_URL` | The exact public HTTPS base URL, with no trailing slash or subpath |
+| `GROQ_API_KEY` | Optional Groq key if using the Groq provider |
 | `GROQ_MODEL` | Optional; defaults to `openai/gpt-oss-20b` |
 
 The public card advertises `AGENT_BASE_URL` (or Render's `RENDER_EXTERNAL_URL`)
