@@ -827,8 +827,8 @@ Rules:
 10. Copy facts from the current invoice evidence. Never invent missing facts.
 11. Select exactly three distinct, relevant references from the package's
     availableEvidenceRefs.
-12. Explain the decision in 60-1500 characters and cite at least two
-    selected references exactly.
+12. Explain the decision in 60-180 characters and cite at least two
+    selected references exactly. Keep each rationale concise.
 13. Return valid JSON only.
 
 Input:
@@ -869,6 +869,7 @@ Input:
                             },
                             {"role": "user", "content": prompt},
                         ],
+                        "max_tokens": 4096,
                         "temperature": 0,
                     },
                     timeout=40.0,
