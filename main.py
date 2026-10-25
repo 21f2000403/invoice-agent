@@ -694,6 +694,7 @@ def validate_decision(decision, package, available_refs):
     if (
         not isinstance(rationale, str)
         or not 60 <= len(rationale) <= 1500
+        or action not in rationale
         or sum(ref in rationale for ref in refs) < 2
     ):
         raise HTTPException(502, "Proposal rationale is invalid")
@@ -825,10 +826,11 @@ Rules:
    duplicate, approval, or material conflict remains.
 9. Use reject_duplicate only when evidence supports a genuine duplicate.
 10. Copy facts from the current invoice evidence. Never invent missing facts.
-11. Select exactly three distinct, relevant references from the package's
-    availableEvidenceRefs.
-12. Explain the decision in 60-180 characters and cite at least two
-    selected references exactly. Keep each rationale concise.
+11. Select exactly three distinct, decisive references from the single
+    paragraph that determines the action. Do not mix paragraphs or use
+    cover-sheet, archive, or training-decoy references.
+12. Explain the decision in 60-180 characters, name the exact action, and
+    cite at least two selected references exactly. Keep each rationale concise.
 13. Return valid JSON only.
 
 Input:
